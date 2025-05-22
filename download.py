@@ -28,9 +28,18 @@ while True:
 
 
 def download_file(url, filename):
+    filename = filename.lower()
+    filepath = os.path.join("images", filename)
+    if os.path.exists(filepath):
+        name, ext = os.path.splitext(filename)
+        orgin = name
+        name, ext = os.path.splitext(url)
+        new_filename = name.split('/')[-1]
+        new_filename = f"{orgin}_{new_filename}{ext}"
+        filepath = os.path.join("images", new_filename)
     response = requests.get(url, stream=True)
     if response.status_code == 200:
-        with open(filename, "wb") as f:
+        with open(filepath, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
@@ -41,6 +50,8 @@ def download_file(url, filename):
 
 print(f"总计获取到 {len(all_data)} 条记录")
 c = 0
+if not os.path.exists("images"):
+    os.makedirs("images")
 for item in all_data:
     filename = item['filename']
     url = item['url']
